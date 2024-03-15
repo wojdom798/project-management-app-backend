@@ -12,7 +12,7 @@ export interface IFeature
     id: number;
     name: string;
     priority: number;
-    isFinished: boolean;
+    progress: number;
 };
 
 
@@ -21,6 +21,7 @@ export interface ITask
     id: number;
     feature_id: number;
     name: string;
+    isFinished: boolean;
 };
 
 
