@@ -75,6 +75,38 @@ function (req: Request, res: Response, next: NextFunction)
 });
 
 
+app.post("/api/update-feature-progress",
+function (req: Request, res: Response, next: NextFunction)
+{
+    console.log(req.body);
+    const responseData = {
+        success: false,
+        errors: [ "could not access debug data." ]
+    }
+
+    if (debugData &&
+        process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
+        fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
+    {
+        for (let task of debugData.tasks)
+        {
+            if (task.id === req.body.taskId)
+            {
+                task.isFinished = req.body.isFinished;
+            }
+        }
+        
+        fs.writeFileSync(
+            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+            JSON.stringify(debugData),
+            "utf-8"
+        )
+    }
+    
+    res.json(responseData);
+});
+
+
 app.listen(portNumber);
 console.log(new Date().toLocaleString("pl-PL",
   { hour12: false }) + ", starting server on port:", portNumber
