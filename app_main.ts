@@ -88,6 +88,14 @@ function (req: Request, res: Response, next: NextFunction)
         process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
         fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
     {
+        for (let feature of debugData.projects[0].features)
+        {
+            if (feature.id === req.body.featureId)
+            {
+                feature.progress = req.body.newProgress;
+            }
+        }
+
         for (let task of debugData.tasks)
         {
             if (task.id === req.body.taskId)
