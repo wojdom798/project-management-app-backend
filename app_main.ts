@@ -115,6 +115,51 @@ function (req: Request, res: Response, next: NextFunction)
 });
 
 
+app.post("/api/create-new-feature",
+function (req: Request, res: Response, next: NextFunction)
+{
+    const responseData = {
+        success: false,
+        errors: [ "could not access debug data." ],
+        payload: {}
+    }
+
+    type submitDataType = {
+        name: string;
+        priority: number;
+    };
+
+    const requestBody = req.body as submitDataType;
+
+    if (debugData &&
+        process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
+        fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
+    {
+        const newId = debugData.projects[0].features.length + 1;
+        debugData.projects[0].features.push({
+            id: newId,
+            name: requestBody.name,
+            priority: requestBody.priority,
+            progress: 0
+        });
+        
+        fs.writeFileSync(
+            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+            JSON.stringify(debugData),
+            "utf-8"
+        )
+
+        responseData.success = true;
+        responseData.errors = [];
+        responseData.payload = {
+            newFeatureId: newId
+        }
+    }
+    
+    res.json(responseData);
+});
+
+
 app.listen(portNumber);
 console.log(new Date().toLocaleString("pl-PL",
   { hour12: false }) + ", starting server on port:", portNumber
