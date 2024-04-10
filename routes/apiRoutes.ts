@@ -140,4 +140,20 @@ function (req: Request, res: Response, next: NextFunction)
 });
 
 
+// route: /api/create-new-task
+router.post("/create-new-task",
+function (req: Request, res: Response, next: NextFunction)
+{
+    const responseData = {
+        success: false,
+        errors: [ "functionality not implemented yet" ],
+        payload: {}
+    }
+
+    console.log(req.body);
+    
+    res.json(responseData);
+});
+
+
 export default router;
