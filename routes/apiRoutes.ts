@@ -150,7 +150,36 @@ function (req: Request, res: Response, next: NextFunction)
         payload: {}
     }
 
-    console.log(req.body);
+    const partialTask = req.body as { name: string, featureId: number };
+
+    // console.log(req.body);
+
+
+    if (debugData &&
+        process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
+        fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
+    {
+        const newId = debugData.tasks.length + 1;
+
+        debugData.tasks.push({
+            id: newId,
+            name: partialTask.name,
+            feature_id: partialTask.featureId,
+            isFinished: false
+        });
+        
+        fs.writeFileSync(
+            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+            JSON.stringify(debugData),
+            "utf-8"
+        )
+
+        responseData.success = true;
+        responseData.errors = [];
+        responseData.payload = {
+            newTaskId: newId
+        }
+    }
     
     res.json(responseData);
 });
