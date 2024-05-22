@@ -185,4 +185,49 @@ function (req: Request, res: Response, next: NextFunction)
 });
 
 
+// route: /api/create-new-project
+router.post("/create-new-project",
+function (req: Request, res: Response, next: NextFunction)
+{
+    const responseData = {
+        success: false,
+        errors: [ "functionality not implemented yet" ],
+        payload: {}
+    }
+
+    const partialProject = req.body as { name: string, description: string };
+
+    console.log(partialProject);
+
+
+    if (debugData &&
+        process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
+        fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
+    {
+        const newId = debugData.projects.length + 1;
+
+        debugData.projects.push({
+            id: newId,
+            name: partialProject.name,
+            description: partialProject.description,
+            features: []
+        });
+        
+        fs.writeFileSync(
+            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+            JSON.stringify(debugData),
+            "utf-8"
+        )
+
+        responseData.success = true;
+        responseData.errors = [];
+        responseData.payload = {
+            newProjectId: newId
+        }
+    }
+    
+    res.json(responseData);
+});
+
+
 export default router;
