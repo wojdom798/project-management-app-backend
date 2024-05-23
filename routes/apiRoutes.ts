@@ -1,6 +1,6 @@
 import fs from "fs";
 import express, {Request, Response, NextFunction} from "express";
-import { IDebugData } from "../types/sharedTypes";
+import { IDebugData, IProject } from "../types/sharedTypes";
 
 const router = express.Router();
 
@@ -107,6 +107,7 @@ function (req: Request, res: Response, next: NextFunction)
     type submitDataType = {
         name: string;
         priority: number;
+        projectId: number;
     };
 
     const requestBody = req.body as submitDataType;
@@ -115,24 +116,36 @@ function (req: Request, res: Response, next: NextFunction)
         process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
         fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
     {
-        const newId = debugData.projects[0].features.length + 1;
-        debugData.projects[0].features.push({
-            id: newId,
-            name: requestBody.name,
-            priority: requestBody.priority,
-            progress: 0
-        });
-        
-        fs.writeFileSync(
-            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
-            JSON.stringify(debugData),
-            "utf-8"
-        )
+        for (let currentProject of debugData.projects)
+        {
+            if (currentProject.id === requestBody.projectId)
+            {
+                const newId = currentProject.features.length + 1;
 
-        responseData.success = true;
-        responseData.errors = [];
-        responseData.payload = {
-            newFeatureId: newId
+                currentProject.features.push({
+                    id: newId,
+                    name: requestBody.name,
+                    priority: requestBody.priority,
+                    progress: 0
+                });
+
+                fs.writeFileSync(
+                    process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+                    JSON.stringify(debugData),
+                    "utf-8"
+                )
+        
+                responseData.success = true;
+                responseData.errors = [];
+                responseData.payload = {
+                    newFeatureId: newId
+                }
+            }
+            else
+            {
+                responseData.success = false;
+                responseData.errors = [ "project does not exist" ];
+            }
         }
     }
     
