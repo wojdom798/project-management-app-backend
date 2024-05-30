@@ -63,32 +63,32 @@ function (req: Request, res: Response, next: NextFunction)
         errors: [ "could not access debug data." ]
     }
 
-    if (debugData &&
-        process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
-        fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
-    {
-        for (let feature of debugData.projects[0].features)
-        {
-            if (feature.id === req.body.featureId)
-            {
-                feature.progress = req.body.newProgress;
-            }
-        }
+    // if (debugData &&
+    //     process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
+    //     fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
+    // {
+    //     for (let feature of debugData.projects[0].features)
+    //     {
+    //         if (feature.id === req.body.featureId)
+    //         {
+    //             feature.progress = req.body.newProgress;
+    //         }
+    //     }
 
-        for (let task of debugData.tasks)
-        {
-            if (task.id === req.body.taskId)
-            {
-                task.isFinished = req.body.isFinished;
-            }
-        }
+    //     for (let task of debugData.tasks)
+    //     {
+    //         if (task.id === req.body.taskId)
+    //         {
+    //             task.isFinished = req.body.isFinished;
+    //         }
+    //     }
         
-        fs.writeFileSync(
-            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
-            JSON.stringify(debugData),
-            "utf-8"
-        )
-    }
+    //     fs.writeFileSync(
+    //         process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+    //         JSON.stringify(debugData),
+    //         "utf-8"
+    //     )
+    // }
     
     res.json(responseData);
 });
@@ -116,36 +116,58 @@ function (req: Request, res: Response, next: NextFunction)
         process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA &&
         fs.existsSync(process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA))
     {
-        for (let currentProject of debugData.projects)
-        {
-            if (currentProject.id === requestBody.projectId)
-            {
-                const newId = currentProject.features.length + 1;
+        // for (let currentProject of debugData.projects)
+        // {
+        //     if (currentProject.id === requestBody.projectId)
+        //     {
+        //         const newId = currentProject.features.length + 1;
 
-                currentProject.features.push({
-                    id: newId,
-                    name: requestBody.name,
-                    priority: requestBody.priority,
-                    progress: 0
-                });
+        //         currentProject.features.push({
+        //             id: newId,
+        //             name: requestBody.name,
+        //             priority: requestBody.priority,
+        //             progress: 0
+        //         });
 
-                fs.writeFileSync(
-                    process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
-                    JSON.stringify(debugData),
-                    "utf-8"
-                )
+        //         fs.writeFileSync(
+        //             process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+        //             JSON.stringify(debugData),
+        //             "utf-8"
+        //         )
         
-                responseData.success = true;
-                responseData.errors = [];
-                responseData.payload = {
-                    newFeatureId: newId
-                }
-            }
-            else
-            {
-                responseData.success = false;
-                responseData.errors = [ "project does not exist" ];
-            }
+        //         responseData.success = true;
+        //         responseData.errors = [];
+        //         responseData.payload = {
+        //             newFeatureId: newId
+        //         }
+        //     }
+        //     else
+        //     {
+        //         responseData.success = false;
+        //         responseData.errors = [ "project does not exist" ];
+        //     }
+        // }
+
+        const newId = debugData.features.length + 1;
+
+        debugData.features.push({
+            id: newId,
+            name: requestBody.name,
+            project_id: requestBody.projectId,
+            priority: requestBody.priority,
+            progress: 0
+        });
+        
+        fs.writeFileSync(
+            process.env.PROJECT_MANAGEMENT_APP_DEBUG_DATA,
+            JSON.stringify(debugData),
+            "utf-8"
+        )
+
+        responseData.success = true;
+        responseData.errors = [];
+        responseData.payload = {
+            newFeatureId: newId
         }
     }
     
@@ -222,8 +244,7 @@ function (req: Request, res: Response, next: NextFunction)
         debugData.projects.push({
             id: newId,
             name: partialProject.name,
-            description: partialProject.description,
-            features: []
+            description: partialProject.description
         });
         
         fs.writeFileSync(

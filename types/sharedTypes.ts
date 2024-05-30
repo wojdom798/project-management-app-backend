@@ -3,7 +3,6 @@ export interface IProject
     id: number;
     name: string;
     description: string;
-    features: IFeature[];
 };
 
 
@@ -13,6 +12,7 @@ export interface IFeature
     name: string;
     priority: number;
     progress: number;
+    project_id: number;
 };
 
 
@@ -29,4 +29,5 @@ export interface IDebugData
 {
     projects: IProject[];
     tasks: ITask[];
+    features: IFeature[];
 };
